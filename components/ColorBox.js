@@ -25,10 +25,15 @@ const ColorBox = props => {
 const styles = StyleSheet.create({
   box: {
     padding: 10,
-    borderRadius: 3,
+    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 1,
+    elevation: 2,
   },
   text: {
     fontWeight: 'bold',
