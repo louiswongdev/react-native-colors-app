@@ -9,6 +9,7 @@ import {
   Switch,
   FlatList,
 } from 'react-native';
+import SingleColorBox from '../components/SingleColorBox';
 
 const COLORS = [
   { colorName: 'AliceBlue', hexCode: '#F0F8FF' },
@@ -35,7 +36,7 @@ const COLORS = [
   { colorName: 'DarkBlue', hexCode: '#00008B' },
   { colorName: 'DarkCyan', hexCode: '#008B8B' },
   { colorName: 'DarkGoldenRod', hexCode: '#B8860B' },
-  { colorName: 'DarkGray', hexCode: '#A9A9A9' },
+  // { colorName: 'DarkGray', hexCode: '#A9A9A9' },
   { colorName: 'DarkGrey', hexCode: '#A9A9A9' },
   { colorName: 'DarkGreen', hexCode: '#006400' },
   { colorName: 'DarkKhaki', hexCode: '#BDB76B' },
@@ -47,13 +48,13 @@ const COLORS = [
   { colorName: 'DarkSalmon', hexCode: '#E9967A' },
   { colorName: 'DarkSeaGreen', hexCode: '#8FBC8F' },
   { colorName: 'DarkSlateBlue', hexCode: '#483D8B' },
-  { colorName: 'DarkSlateGray', hexCode: '#2F4F4F' },
+  // { colorName: 'DarkSlateGray', hexCode: '#2F4F4F' },
   { colorName: 'DarkSlateGrey', hexCode: '#2F4F4F' },
   { colorName: 'DarkTurquoise', hexCode: '#00CED1' },
   { colorName: 'DarkViolet', hexCode: '#9400D3' },
   { colorName: 'DeepPink', hexCode: '#FF1493' },
   { colorName: 'DeepSkyBlue', hexCode: '#00BFFF' },
-  { colorName: 'DimGray', hexCode: '#696969' },
+  // { colorName: 'DimGray', hexCode: '#696969' },
   { colorName: 'DimGrey', hexCode: '#696969' },
   { colorName: 'DodgerBlue', hexCode: '#1E90FF' },
   { colorName: 'FireBrick', hexCode: '#B22222' },
@@ -64,7 +65,7 @@ const COLORS = [
   { colorName: 'GhostWhite', hexCode: '#F8F8FF' },
   { colorName: 'Gold', hexCode: '#FFD700' },
   { colorName: 'GoldenRod', hexCode: '#DAA520' },
-  { colorName: 'Gray', hexCode: '#808080' },
+  // { colorName: 'Gray', hexCode: '#808080' },
   { colorName: 'Grey', hexCode: '#808080' },
   { colorName: 'Green', hexCode: '#008000' },
   { colorName: 'GreenYellow', hexCode: '#ADFF2F' },
@@ -82,14 +83,14 @@ const COLORS = [
   { colorName: 'LightCoral', hexCode: '#F08080' },
   { colorName: 'LightCyan', hexCode: '#E0FFFF' },
   { colorName: 'LightGoldenRodYellow', hexCode: '#FAFAD2' },
-  { colorName: 'LightGray', hexCode: '#D3D3D3' },
+  // { colorName: 'LightGray', hexCode: '#D3D3D3' },
   { colorName: 'LightGrey', hexCode: '#D3D3D3' },
   { colorName: 'LightGreen', hexCode: '#90EE90' },
   { colorName: 'LightPink', hexCode: '#FFB6C1' },
   { colorName: 'LightSalmon', hexCode: '#FFA07A' },
   { colorName: 'LightSeaGreen', hexCode: '#20B2AA' },
   { colorName: 'LightSkyBlue', hexCode: '#87CEFA' },
-  { colorName: 'LightSlateGray', hexCode: '#778899' },
+  // { colorName: 'LightSlateGray', hexCode: '#778899' },
   { colorName: 'LightSlateGrey', hexCode: '#778899' },
   { colorName: 'LightSteelBlue', hexCode: '#B0C4DE' },
   { colorName: 'LightYellow', hexCode: '#FFFFE0' },
@@ -142,7 +143,7 @@ const COLORS = [
   { colorName: 'Silver', hexCode: '#C0C0C0' },
   { colorName: 'SkyBlue', hexCode: '#87CEEB' },
   { colorName: 'SlateBlue', hexCode: '#6A5ACD' },
-  { colorName: 'SlateGray', hexCode: '#708090' },
+  // { colorName: 'SlateGray', hexCode: '#708090' },
   { colorName: 'SlateGrey', hexCode: '#708090' },
   { colorName: 'Snow', hexCode: '#FFFAFA' },
   { colorName: 'SpringGreen', hexCode: '#00FF7F' },
@@ -178,17 +179,20 @@ const ColorPaletteModalScreen = ({ navigation }) => {
     }
   }, [name, selectedColors]);
 
-  const handleValueChange = useCallback((value, color) => {
-    if (value) {
-      setSelectedColors(colors => [...colors, color]);
-    } else {
-      setSelectedColors(colors =>
-        colors.filter(
-          selectedColor => color.colorName !== selectedColor.colorName,
-        ),
-      );
-    }
-  }, []);
+  const handleValueChange = useCallback(
+    (isToggled, color) => {
+      if (isToggled) {
+        setSelectedColors(colors => [...colors, color]);
+      } else {
+        setSelectedColors(colors =>
+          colors.filter(
+            selectedColor => color.colorName !== selectedColor.colorName,
+          ),
+        );
+      }
+    },
+    [selectedColors, setSelectedColors],
+  );
 
   return (
     <View style={styles.container}>
@@ -204,17 +208,18 @@ const ColorPaletteModalScreen = ({ navigation }) => {
         data={COLORS}
         keyExtractor={item => item.colorName}
         renderItem={({ item }) => (
-          <View style={styles.color}>
-            <Text>{item.colorName}</Text>
+          <View style={styles.colorRow}>
+            <View style={styles.colorsContainer}>
+              <SingleColorBox color={item} />
+              <Text>{item.colorName}</Text>
+            </View>
             <Switch
               value={
                 !!selectedColors.find(
                   color => color.colorName === item.colorName,
                 )
               }
-              onValueChange={selected => {
-                handleValueChange(selected, item);
-              }}
+              onValueChange={isToggled => handleValueChange(isToggled, item)}
             />
           </View>
         )}
@@ -252,13 +257,17 @@ const styles = StyleSheet.create({
   name: {
     marginBottom: 10,
   },
-  color: {
+  colorRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'grey',
+  },
+  colorsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 
